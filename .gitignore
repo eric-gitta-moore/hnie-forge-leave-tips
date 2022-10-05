@@ -1,0 +1,4 @@
+/node_modules
+.hbuilderx
+/unpackage/*
+!/unpackage/res
