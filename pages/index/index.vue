@@ -314,7 +314,8 @@
 				handler(value) {
 					this.$store.dispatch('dispatchForm', value)
 				},
-				deep: true
+				deep: true,
+				immediate: true
 			}
 		},
 		methods: {
