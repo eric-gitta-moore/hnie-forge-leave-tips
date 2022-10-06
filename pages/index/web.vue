@@ -55,10 +55,15 @@
 				if (msg.data.args.data.name == 'postMessage') {
 					const message = msg.data.args.data.arg
 					this.lastPostMessage = message
+					console.log('onPostMessage', message);
 					if (message?.action === 'updateTitle' && message?.title) {
-						this.currentWebview.setStyle({
-							titleText: message.title
-						})
+						const style = {
+							titleNView: {
+								titleText: message.title
+							}
+						}
+						console.log('style', style);
+						this.currentWebview.setStyle(style)
 					}
 				}
 			});
