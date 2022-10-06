@@ -55,6 +55,11 @@
 				if (msg.data.args.data.name == 'postMessage') {
 					const message = msg.data.args.data.arg
 					this.lastPostMessage = message
+					if (message?.action === 'updateTitle' && message?.title) {
+						this.currentWebview.setStyle({
+							titleText: message.title
+						})
+					}
 				}
 			});
 		},
@@ -138,16 +143,21 @@
 				this.subWebview = wv
 			},
 			addListener(wv) {
-				wv.addEventListener('titleUpdate', (e) => {
-					this.currentWebview.setStyle({
-						titleNView: {
-							titleText: e.title
-						}
-					})
-				})
+				// 不是更新title标签的标题
+				// wv.addEventListener('titleUpdate', (e) => {
+				// 	this.currentWebview.setStyle({
+				// 		titleNView: {
+				// 			titleText: e.title
+				// 		}
+				// 	})
+				// })
 
-				wv.addEventListener('loading', (e) => {
-					wv.evalJS(`
+				/**
+				 * webview向app传递信息
+				 */
+				true ||
+					wv.addEventListener('loading', (e) => {
+						wv.evalJS(`
 					document.addEventListener('UniAppJSBridgeReady', function() {
 						     	uni.postMessage({
 						     		data: {
@@ -156,7 +166,7 @@
 						     	});
 							 })
 							 `)
-				})
+					})
 
 				wv.appendJsFile('_www/static/js/uni.webview.1.5.4.js')
 				wv.appendJsFile('_www/static/js/ajaxhook.min.js')
