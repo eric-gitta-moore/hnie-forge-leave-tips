@@ -40,6 +40,7 @@ try {
 		 * 同步标题
 		 */
 		let title = document.querySelector('h1.mui-title').textContent
+		console.log(`当前标题为：${title}`);
 		uni.postMessage({
 			data: {
 				action: 'updateTitle',
