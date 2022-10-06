@@ -10,11 +10,13 @@
 </template>
 
 <script>
-	import apply from '../../assets/apply.js'
-	import audit from '../../assets/audit.js'
+	import apply from '@/assets/apply.js'
+	import audit from '@/assets/audit.js'
 	import stringify from "json-stringify-pretty-compact";
+	import DateUtil from '@/util/date.js'
 	import {
-		mapState
+		mapState,
+		mapGetters
 	} from 'vuex'
 	import dayjs from 'dayjs'
 	import {
@@ -24,20 +26,15 @@
 	export default {
 		name: 'Generate',
 		data() {
-			return {
-				auditText: '',
-				applyCodeText: '',
-			}
+			return {}
 		},
 		computed: {
 			...mapState({
 				form: s => s.form
 			}),
+			...mapGetters(['auditText', 'applyCodeText'])
 		},
-		created() {
-			this.auditText = this.getAuditText()
-			this.applyCodeText = this.getApplyCodeText()
-		},
+		created() {},
 		methods: {
 			getAuditText() {
 				const code = cloneDeep(audit)
@@ -75,14 +72,8 @@
 					.minute(random(1, 59))
 					.second(random(1, 59))
 					.format('YYYY-MM-DD HH:mm:ss')
-				code.ts = code.jsTs = dayjs.unix(this.form.endTime).diff(dayjs.unix(this.form.beginTime), 'day')
-				code.hour = code.jsHour = Math.ceil(
-					dayjs.unix(this.form.endTime)
-					.diff(dayjs
-						.unix(this.form.beginTime)
-						.subtract(code.ts, 'day'), 'hour', true)
-				)
-
+				code.ts = code.jsTs = DateUtil.calcDiffDay(this.form.beginTime, this.form.endTime)
+				code.hour = code.jsHour = DateUtil.calcDiffHourWithoutDays(this.form.beginTime, this.form.endTime)
 
 				return stringify(code, {
 					maxLength: 50

@@ -1,8 +1,15 @@
 import {
-	cloneDeep
+	cloneDeep,
+	random
 } from 'lodash-es'
 import Vue from 'vue'
 import Vuex from 'vuex'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn' // 导入本地化语言
+dayjs.locale('zh-cn') // 使用本地化语言
+import apply from '@/assets/apply.js'
+import audit from '@/assets/audit.js'
+import stringify from "json-stringify-pretty-compact";
 
 Vue.use(Vuex)
 const keyForm = 'form'
@@ -13,6 +20,61 @@ const store = new Vuex.Store({
 	state: {
 		form: {}
 	},
+	getters: {
+		auditText(state, getters) {
+			return stringify(getters.audit, {
+				maxLength: 50
+			})
+		},
+		audit(state) {
+			const code = cloneDeep(audit)
+			code[0].SHSJ = dayjs.unix(state.form.headmasterApproveTime).format('YYYY-MM-DD HH:mm:ss')
+			code[1].SHSJ = dayjs.unix(state.form.instructorApproveTime).format('YYYY-MM-DD HH:mm:ss')
+			return code
+		},
+		applyCode(state) {
+			const code = cloneDeep(apply)
+			code.qjdh = `${dayjs().format('YYYYMM')}${random(1000,9999)}`
+			code.qjlxM.mc = state.form.type
+			code.stu.xh = state.form.id
+			code.stu.szbj.bjmc = state.form.className
+			code.stu.xm = state.form.name
+			code.stu.xb.mc = state.form.sex
+			code.kssj = dayjs.unix(state.form.beginTime).format('YYYY-MM-DD HH:mm:ss')
+			code.jssj = dayjs.unix(state.form.endTime).format('YYYY-MM-DD HH:mm:ss')
+			code.qjsy = state.form.reason
+
+			if (state.form.leaveSchool) {
+				code.lxInd = '1'
+				code.lxqx.dm = state.form.dest.area.value
+				code.lxMdd = state.form.destDetail
+			} else {
+				code.lxInd = '0'
+				code.lxMdd = null
+				code.lxqx = null
+			}
+
+			code.xjsj = dayjs.unix(state.form.endTime)
+				.add(2, 'month')
+				.hour(random(8, 22))
+				.minute(random(1, 59))
+				.second(random(1, 59))
+				.format('YYYY-MM-DD HH:mm:ss')
+			code.ts = code.jsTs = dayjs.unix(state.form.endTime).diff(dayjs.unix(state.form.beginTime), 'day')
+			code.hour = code.jsHour = Math.ceil(
+				dayjs.unix(state.form.endTime)
+				.diff(dayjs
+					.unix(state.form.beginTime)
+					.subtract(code.ts, 'day'), 'hour', true)
+			)
+			return code
+		},
+		applyCodeText(state, getters) {
+			return stringify(getters.applyCode, {
+				maxLength: 50
+			})
+		}
+	},
 	mutations: {
 		SET_FORM(state, obj) {
 			Object.assign(state.form, obj)
@@ -21,6 +83,7 @@ const store = new Vuex.Store({
 	actions: {
 		dispatchForm(ctx, obj) {
 			const data = cloneDeep(obj)
+			ctx.commit('SET_FORM', data)
 			uni.setStorage({
 				data: data,
 				key: keyForm,
@@ -28,8 +91,7 @@ const store = new Vuex.Store({
 					console.log('保存成功', data);
 				}
 			})
-			ctx.commit('SET_FORM', obj)
-		}
+		},
 	},
 	strict: true
 })

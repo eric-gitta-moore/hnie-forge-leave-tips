@@ -62,5 +62,6 @@ export default {
 			"properties",
 			"operationType"
 		]
-	}
+	},
+	tjlx: "s"
 }
