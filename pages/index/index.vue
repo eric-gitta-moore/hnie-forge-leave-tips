@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<u-navbar title='易班请假数据生成' :is-back='false' :background='{background:`#f8f8f8`}' :title-bold='true'
-			title-color='#000'>
+			:height='navbarHeight' title-color='#000'>
 			<template #right>
 				<u-icon name='more-dot-fill' style='margin: 0 24px;' @click='aboutActionSheetIsShow=true'></u-icon>
 			</template>
@@ -12,6 +12,8 @@
 		<wrap-version-update ref="wrapVersionUpdate" id="633d4fda0f90b7000173039a" @check='onUpdateCheck'>
 		</wrap-version-update>
 
+		<u-top-tips ref="uTips" :navbar-height='statusBarHeight+navbarHeight'></u-top-tips>
+
 		<u-section class='section' title='设置' :right='false'></u-section>
 		<u-form :label-width='250'>
 			<u-form-item label='自动计算'>
@@ -21,7 +23,7 @@
 			</u-form-item>
 			<u-form-item label='自动生成'>
 				<view style='width: 100%;'>
-					<u-button @click='actionSheetIsShow=true'>点我快速填写时间</u-button>
+					<u-button @click='actionSheetIsShow=true'>点我快速生成</u-button>
 					<u-action-sheet v-model="actionSheetIsShow" :list='actionSheetList' @click='automaticCompletion'>
 					</u-action-sheet>
 				</view>
@@ -80,6 +82,9 @@
 					:default-time='endTimeText'>
 				</u-picker>
 			</u-form-item>
+			<u-form-item label='计算时长'>
+				<u-input v-model="computedDuringTime" disabled></u-input>
+			</u-form-item>
 
 			<u-divider half-width='100%' class='form-divider' :margin-top='20' :margin-bottom='20'>审批信息</u-divider>
 
@@ -92,6 +97,9 @@
 					:default-time='headmasterApproveTimeText'>
 				</u-picker>
 			</u-form-item>
+			<u-form-item label='班主任审批意见'>
+				<u-input v-model="form.headmasterApproveReason" placeholder='默认是"通过"'></u-input>
+			</u-form-item>
 			<u-form-item label='辅导员审批时间'>
 				<u-input v-model="instructorApproveTimeText" type='select'
 					@click='pickerInstructorApproveTimeTimeIsShow=true'></u-input>
@@ -100,11 +108,24 @@
 					:default-time='instructorApproveTimeText'>
 				</u-picker>
 			</u-form-item>
+			<u-form-item label='辅导员审批意见'>
+				<u-input v-model="form.instructorApproveReason" placeholder='默认值是空的'></u-input>
+			</u-form-item>
+			<u-form-item label='副书记审批时间' :label-style='{"background-color": `#ff5e66`}' v-if="computedDays>=3">
+				<u-input v-model="secretaryApproveTimeText" type='select'
+					@click='pickerSecretaryApproveTimeTimeIsShow=true'></u-input>
+				<u-picker :params='pickerApproveTimeParams' v-model="pickerSecretaryApproveTimeTimeIsShow"
+					@confirm='(res)=>form.secretaryApproveTime=res.timestamp' :default-time='secretaryApproveTimeText'>
+				</u-picker>
+			</u-form-item>
+			<u-form-item label='副书记审批意见'>
+				<u-input v-model="form.secretaryApproveReason" placeholder='生成之前请三思,该空默认值未知'></u-input>
+			</u-form-item>
 			<u-row class='button-group'>
-				<u-col>
+				<u-col class='button-group__item'>
 					<u-button type='primary' @click='reset'>重置</u-button>
 				</u-col>
-				<u-col>
+				<u-col class='button-group__item'>
 					<u-button type='success' @click='generate'>生成</u-button>
 				</u-col>
 			</u-row>
@@ -115,12 +136,19 @@
 
 <script>
 	import dayjs from 'dayjs'
+	import 'dayjs/locale/zh-cn' // 导入本地化语言
+	dayjs.locale('zh-cn') // 使用本地化语言
 	import {
 		cloneDeep
 	} from 'lodash-es'
-	import 'dayjs/locale/zh-cn' // 导入本地化语言
 	import random from 'uview-ui/libs/function/random'
-	dayjs.locale('zh-cn') // 使用本地化语言
+	import {
+		mapGetters,
+		mapState,
+		mapActions
+	} from 'vuex'
+	import DateUtil from '@/util/date.js'
+	import treeDaysLeaveTipExample from '@/assets/threeDaysLeaveTipExample'
 
 	export default {
 		data() {
@@ -128,18 +156,12 @@
 			if (Object.entries(this.$store.state.form).length) {
 				Object.assign(presetData, this.$store.state.form)
 			}
-			if (process.env.NODE_ENV === 'development' && false) {
-				Object.assign(presetData, {
-					id: '202110050329',
-					name: '陈柯雨',
-					sex: '男',
-					className: '软件工程2102',
-					type: '病假',
-					reason: '去第六人民院看病',
-					destDetail: '湘潭市第六人民医院',
-				})
-			}
 			return {
+
+				// 状态栏高度，H5中，此值为0，因为H5不可操作状态栏
+				statusBarHeight: uni.getSystemInfoSync().statusBarHeight,
+				// 导航栏内容区域高度，不包括状态栏高度在内
+				navbarHeight: 44,
 				configure: {
 					autoCalc: true
 				},
@@ -168,8 +190,18 @@
 					destDetail: '',
 					beginTime: dayjs().hour(8).minute(0).second(0).unix(),
 					endTime: dayjs().hour(12).minute(0).second(0).unix(),
-					headmasterApproveTime: dayjs().add(-1, 'day').hour(8).unix(),
-					instructorApproveTime: dayjs().add(-1, 'day').hour(10).add(random(2, 30), 'minute').unix()
+					headmasterApproveTime: DateUtil.radomUnixTimeWithHour(8)
+						.add(-1, 'day')
+						.unix(),
+					instructorApproveTime: DateUtil.radomUnixTimeWithHour(9)
+						.add(-1, 'day')
+						.unix(),
+					secretaryApproveTime: DateUtil.radomUnixTimeWithHour(10)
+						.add(-1, 'day')
+						.unix(),
+					headmasterApproveReason: '通过',
+					instructorApproveReason: '',
+					secretaryApproveReason: '',
 				}, presetData),
 				formDefault: {},
 
@@ -213,6 +245,7 @@
 				pickerEndTimeIsShow: false,
 				pickerHeadmasterApproveTimeIsShow: false,
 				pickerInstructorApproveTimeTimeIsShow: false,
+				pickerSecretaryApproveTimeTimeIsShow: false,
 				pickerRegionDestIsShow: false,
 
 				actionSheetIsShow: false,
@@ -224,6 +257,9 @@
 					text: '昨天上午'
 				}, {
 					text: '昨天下午'
+				}, {
+					text: '四天请假例子',
+					subText: '加载一个真实四天请假的例子'
 				}, ],
 
 				aboutActionSheetIsShow: false,
@@ -232,11 +268,20 @@
 					},
 					{
 						text: '关于'
+					},
+					{
+						text: 'webview'
 					}
-				]
+				],
+				computedDays: 0,
+				computedHours: 0,
 			}
 		},
 		computed: {
+			...mapGetters(['applyCode']),
+			computedDuringTime() {
+				return `${this.computedDays} 天 ${this.computedHours} 小时`
+			},
 			beginTimeText: {
 				get() {
 					return dayjs.unix(this.form.beginTime).format('YYYY-MM-DD HH:mm:ss')
@@ -269,6 +314,14 @@
 
 				}
 			},
+			secretaryApproveTimeText: {
+				get() {
+					return dayjs.unix(this.form.secretaryApproveTime).format('YYYY-MM-DD HH:mm:ss')
+				},
+				set() {
+
+				}
+			},
 			destText: {
 				get() {
 					const dest = this.form.dest
@@ -286,16 +339,7 @@
 				return [this.selectTypeList.findIndex(e => e.value === this.form.type)]
 			}
 		},
-		onLoad() {
-			const initializeFormData = {}
-			try {
-				const keyFormData = uni.getStorageSync('form')
-				keyFormData && Object.assign(initializeFormData, keyFormData)
-			} catch (e) {
-				console.warn(e);
-			}
-			Object.assign(this.form, initializeFormData)
-		},
+		onLoad() {},
 		mounted() {
 			this.saveDefault()
 		},
@@ -308,14 +352,14 @@
 			'form.endTime': {
 				handler() {
 					this.autoCalc()
-				}
+				},
+				immediate: true
 			},
 			form: {
-				handler(value) {
+				async handler(value) {
 					this.$store.dispatch('dispatchForm', value)
 				},
 				deep: true,
-				immediate: true
 			}
 		},
 		methods: {
@@ -334,18 +378,28 @@
 			autoCalc() {
 				if (!this.configure.autoCalc) return false;
 
-				this.form.headmasterApproveTime = dayjs.unix(this.form.beginTime)
+				this.form.headmasterApproveTime = DateUtil.radomUnixTimeWithHour(8, this.form.beginTime)
 					.add(-1, 'day')
-					.hour(8)
-					.minute(random(1, 59))
-					.second(random(1, 59))
 					.unix()
-				this.form.instructorApproveTime = dayjs.unix(this.form.beginTime)
+				this.form.instructorApproveTime = DateUtil.radomUnixTimeWithHour(9, this.form.beginTime)
 					.add(-1, 'day')
-					.hour(10)
-					.minute(random(1, 59))
-					.second(random(1, 59))
 					.unix()
+
+				this.form.secretaryApproveTime = DateUtil.radomUnixTimeWithHour(10, this.form.beginTime)
+					.add(-1, 'day')
+					.unix()
+
+				const days = DateUtil.calcDiffDay(this.form.beginTime, this.form.endTime)
+				const hours = DateUtil.calcDiffHourWithoutDays(this.form.beginTime, this.form.endTime)
+				if (days >= 3) {
+					this.$refs.uTips?.show({
+						title: '超过及三天需要副书记审核',
+						type: 'warning',
+						duration: 2000
+					});
+				}
+				this.computedDays = days
+				this.computedHours = hours
 			},
 			generate() {
 				uni.navigateTo({
@@ -373,6 +427,10 @@
 						this.form.beginTime = dayjs().add(-1, 'day').hour(14).minute(0).second(0).unix()
 						this.form.endTime = dayjs().add(-1, 'day').hour(18).minute(0).second(0).unix()
 						break;
+
+					case '四天请假例子':
+						Object.assign(this.form, treeDaysLeaveTipExample)
+						break;
 				}
 			},
 			onClickAbout(idx) {
@@ -386,6 +444,12 @@
 					case '使用帮助':
 						uni.navigateTo({
 							url: '/pages/about/help'
+						})
+						break;
+
+					case 'webview':
+						uni.navigateTo({
+							url: '/pages/index/web'
 						})
 						break;
 				}
@@ -420,7 +484,8 @@
 	}
 
 	.button-group {
-		margin-top: 10px;
-		gap: 10px
+		&__item {
+			margin-top: 20rpx;
+		}
 	}
 </style>
