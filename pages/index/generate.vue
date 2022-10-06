@@ -35,51 +35,7 @@
 			...mapGetters(['auditText', 'applyCodeText'])
 		},
 		created() {},
-		methods: {
-			getAuditText() {
-				const code = cloneDeep(audit)
-				code[0].SHSJ = dayjs.unix(this.form.headmasterApproveTime).format('YYYY-MM-DD HH:mm:ss')
-				code[1].SHSJ = dayjs.unix(this.form.instructorApproveTime).format('YYYY-MM-DD HH:mm:ss')
-				return stringify(code, {
-					maxLength: 50
-				})
-			},
-			getApplyCodeText() {
-				const code = cloneDeep(apply)
-				code.qjdh = `${dayjs().format('YYYYMM')}${random(1000,9999)}`
-				code.qjlxM.mc = this.form.type
-				code.stu.xh = this.form.id
-				code.stu.szbj.bjmc = this.form.className
-				code.stu.xm = this.form.name
-				code.stu.xb.mc = this.form.sex
-				code.kssj = dayjs.unix(this.form.beginTime).format('YYYY-MM-DD HH:mm:ss')
-				code.jssj = dayjs.unix(this.form.endTime).format('YYYY-MM-DD HH:mm:ss')
-				code.qjsy = this.form.reason
-
-				if (this.form.leaveSchool) {
-					code.lxInd = '1'
-					code.lxqx.dm = this.form.dest.area.value
-					code.lxMdd = this.form.destDetail
-				} else {
-					code.lxInd = '0'
-					code.lxMdd = null
-					code.lxqx = null
-				}
-
-				code.xjsj = dayjs.unix(this.form.endTime)
-					.add(2, 'month')
-					.hour(random(8, 22))
-					.minute(random(1, 59))
-					.second(random(1, 59))
-					.format('YYYY-MM-DD HH:mm:ss')
-				code.ts = code.jsTs = DateUtil.calcDiffDay(this.form.beginTime, this.form.endTime)
-				code.hour = code.jsHour = DateUtil.calcDiffHourWithoutDays(this.form.beginTime, this.form.endTime)
-
-				return stringify(code, {
-					maxLength: 50
-				})
-			}
-		}
+		methods: {}
 	}
 </script>
 

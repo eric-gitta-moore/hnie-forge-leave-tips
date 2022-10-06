@@ -12,7 +12,7 @@ export default [{
 	// 步数
 	"BS": 1
 }, {
-	"SHYJ": null,
+	"SHYJ": '',
 	"LXMC": "辅导员审核",
 	"SHZTMC": "已通过",
 	"SHZT": "1",
