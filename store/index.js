@@ -9,7 +9,9 @@ import 'dayjs/locale/zh-cn' // 导入本地化语言
 dayjs.locale('zh-cn') // 使用本地化语言
 import apply from '@/assets/apply.js'
 import audit from '@/assets/audit.js'
+import auditSecretary from '@/assets/audit-secretary.js'
 import stringify from "json-stringify-pretty-compact";
+import DateUtil from '@/util/date.js'
 
 Vue.use(Vuex)
 const keyForm = 'form'
@@ -26,10 +28,20 @@ const store = new Vuex.Store({
 				maxLength: 50
 			})
 		},
-		audit(state) {
+		audit(state, getters) {
 			const code = cloneDeep(audit)
 			code[0].SHSJ = dayjs.unix(state.form.headmasterApproveTime).format('YYYY-MM-DD HH:mm:ss')
+			code[0].SHYJ = state.form.headmasterApproveReason
 			code[1].SHSJ = dayjs.unix(state.form.instructorApproveTime).format('YYYY-MM-DD HH:mm:ss')
+			code[1].SHYJ = state.form.instructorApproveReason
+
+			if (getters.applyCode.ts >= 3) {
+				const auditSecretaryData = cloneDeep(auditSecretary)
+				auditSecretaryData.SHSJ = dayjs.unix(state.form.secretaryApproveTime).format(
+					'YYYY-MM-DD HH:mm:ss')
+				auditSecretaryData.SHYJ = state.form.secretaryApproveReason
+				code[2] = auditSecretaryData
+			}
 			return code
 		},
 		applyCode(state) {
@@ -43,6 +55,8 @@ const store = new Vuex.Store({
 			code.kssj = dayjs.unix(state.form.beginTime).format('YYYY-MM-DD HH:mm:ss')
 			code.jssj = dayjs.unix(state.form.endTime).format('YYYY-MM-DD HH:mm:ss')
 			code.qjsy = state.form.reason
+			code.lxr = state.form.emergencyContact
+			code.lxrdh = state.form.emergencyContactPhone
 
 			if (state.form.leaveSchool) {
 				code.lxInd = '1'
@@ -60,13 +74,9 @@ const store = new Vuex.Store({
 				.minute(random(1, 59))
 				.second(random(1, 59))
 				.format('YYYY-MM-DD HH:mm:ss')
-			code.ts = code.jsTs = dayjs.unix(state.form.endTime).diff(dayjs.unix(state.form.beginTime), 'day')
-			code.hour = code.jsHour = Math.ceil(
-				dayjs.unix(state.form.endTime)
-				.diff(dayjs
-					.unix(state.form.beginTime)
-					.subtract(code.ts, 'day'), 'hour', true)
-			)
+			code.ts = code.jsTs = DateUtil.calcDiffDay(state.form.beginTime, state.form.endTime)
+
+			code.hour = code.jsHour = DateUtil.calcDiffHourWithoutDays(state.form.beginTime, state.form.endTime)
 			return code
 		},
 		applyCodeText(state, getters) {

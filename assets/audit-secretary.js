@@ -1,5 +1,5 @@
 export default {
-	"SHYJ": null,
+	"SHYJ": '',
 	"LXMC": "副书记审批",
 	"SHZTMC": "已通过",
 	"SHZT": "1",

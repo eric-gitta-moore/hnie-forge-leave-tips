@@ -63,5 +63,9 @@ export default {
 			"operationType"
 		]
 	},
-	tjlx: "s"
+	tjlx: "s",
+	// 紧急联系人
+	lxr: null,
+	// 紧急联系人电话
+	lxrdh: null
 }

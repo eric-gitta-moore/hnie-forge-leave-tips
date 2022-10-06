@@ -56,6 +56,14 @@
 			<u-form-item label='请假事由'>
 				<u-input v-model="form.reason"></u-input>
 			</u-form-item>
+			<u-form-item label='紧急联系人'>
+				<u-input v-model="form.emergencyContact" placeholder='可留空'></u-input>
+			</u-form-item>
+			<u-form-item label='紧急联系人电话'>
+				<u-input v-model="form.emergencyContactPhone" placeholder='可留空'></u-input>
+			</u-form-item>
+
+
 			<u-form-item label='离校'>
 				<view style="display: flex;justify-content: flex-end;flex:1">
 					<u-switch v-model="form.leaveSchool"></u-switch>
@@ -126,7 +134,10 @@
 					<u-button type='primary' @click='reset'>重置</u-button>
 				</u-col>
 				<u-col class='button-group__item'>
-					<u-button type='success' @click='generate'>生成</u-button>
+					<u-button type='warning' @click='gotoGenerate'>生成代码</u-button>
+				</u-col>
+				<u-col class='button-group__item'>
+					<u-button type='success' @click='gotoInject'>注入易班</u-button>
 				</u-col>
 			</u-row>
 		</u-form>
@@ -172,6 +183,8 @@
 					className: '',
 					type: '病假',
 					reason: '',
+					emergencyContact: '',
+					emergencyContactPhone: '',
 					leaveSchool: true,
 					dest: {
 						"province": {
@@ -269,9 +282,9 @@
 					{
 						text: '关于'
 					},
-					{
-						text: 'webview'
-					}
+					// {
+					// 	text: 'webview'
+					// }
 				],
 				computedDays: 0,
 				computedHours: 0,
@@ -401,9 +414,14 @@
 				this.computedDays = days
 				this.computedHours = hours
 			},
-			generate() {
+			gotoGenerate() {
 				uni.navigateTo({
 					url: 'generate'
+				})
+			},
+			gotoInject() {
+				uni.navigateTo({
+					url: 'web'
 				})
 			},
 			automaticCompletion(idx) {
