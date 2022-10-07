@@ -15,7 +15,7 @@
 						color: '#00FF00'
 					}
 				},
-				url: about
+				url: 'https://sholaegi5k.feishu.cn/docx/doxcnqDzMafQjYhl3Yr4u0ejKUh'
 			}
 		},
 		onLoad() {

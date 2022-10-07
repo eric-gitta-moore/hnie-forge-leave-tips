@@ -57,9 +57,13 @@ const store = new Vuex.Store({
 			code.qjsy = state.form.reason
 			code.lxr = state.form.emergencyContact
 			code.lxrdh = state.form.emergencyContactPhone
-			code.fileList = state.form.fileList.map(e => ({
-				path: e.base64
-			}))
+			code.fileList = state.form.fileList.map(e => {
+				console.log(111, e);
+				const data = e.url.indexOf('data') === 0 ? e.url : e.base64
+				return {
+					path: data
+				}
+			})
 
 			if (state.form.leaveSchool) {
 				code.lxInd = '1'
@@ -77,6 +81,7 @@ const store = new Vuex.Store({
 				.minute(random(1, 59))
 				.second(random(1, 59))
 				.format('YYYY-MM-DD HH:mm:ss')
+			code.xjsj = code.jssj
 			code.ts = code.jsTs = DateUtil.calcDiffDay(state.form.beginTime, state.form.endTime)
 
 			code.hour = code.jsHour = DateUtil.calcDiffHourWithoutDays(state.form.beginTime, state.form.endTime)
@@ -90,7 +95,8 @@ const store = new Vuex.Store({
 	},
 	mutations: {
 		SET_FORM(state, obj) {
-			Object.assign(state.form, obj)
+			const newData = cloneDeep(state.form)
+			state.form = Object.assign(newData, obj)
 		}
 	},
 	actions: {
