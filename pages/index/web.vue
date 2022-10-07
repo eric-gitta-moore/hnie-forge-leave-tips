@@ -182,6 +182,10 @@
 				const applyList = (wv) => {
 					console.log(`intercept applyList`);
 					const data = cloneDeep(ApplyListDataTemplate)
+					data.LXMC = this.form.type
+					data.QJSY = this.form.reason
+					data.TS = this.form.computedDays
+					data.HOUR = this.form.computedHours
 					wv.evalJS(`window.applyList = ${JSON.stringify(data)}`)
 				}
 

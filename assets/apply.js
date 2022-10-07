@@ -67,5 +67,10 @@ export default {
 	// 紧急联系人
 	lxr: null,
 	// 紧急联系人电话
-	lxrdh: null
+	lxrdh: null,
+	fileList: [
+		// {
+		// 	"path": "uploads/STU/2022/leave/Screenshot_2022-09-01-12-05-33-888_com.tencent.mm.jpg",
+		// }
+	]
 }

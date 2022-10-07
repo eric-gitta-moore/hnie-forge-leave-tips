@@ -57,6 +57,9 @@ const store = new Vuex.Store({
 			code.qjsy = state.form.reason
 			code.lxr = state.form.emergencyContact
 			code.lxrdh = state.form.emergencyContactPhone
+			code.fileList = state.form.fileList.map(e => ({
+				path: e.base64
+			}))
 
 			if (state.form.leaveSchool) {
 				code.lxInd = '1'
