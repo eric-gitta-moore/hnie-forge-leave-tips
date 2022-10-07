@@ -135,6 +135,8 @@
 				<u-input v-model="form.secretaryApproveReason" placeholder='生成之前请三思,该空默认值未知'></u-input>
 			</u-form-item>
 			<u-row class='button-group'>
+				<u-alert-tips class='button-group__item' type="warning" title="使用提示"
+					description="代码生成是给HttpCanary使用的.正常情况下使用注入易班即可.如果进入易班后无法返回,请点击右上角.其他更多帮助点击右上角."></u-alert-tips>
 				<u-col class='button-group__item'>
 					<u-button type='primary' @click='reset'>重置</u-button>
 				</u-col>
