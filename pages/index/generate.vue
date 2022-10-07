@@ -34,7 +34,9 @@
 			}),
 			...mapGetters(['auditText', 'applyCodeText'])
 		},
-		created() {},
+		created() {
+			console.log(`this.form.fileList`, this.form.fileList);
+		},
 		methods: {}
 	}
 </script>

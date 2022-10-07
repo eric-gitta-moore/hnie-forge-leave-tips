@@ -7,6 +7,11 @@ dayjs@^1.11.5:
   resolved "https://registry.npmmirror.com/dayjs/-/dayjs-1.11.5.tgz#00e8cc627f231f9499c19b38af49f56dc0ac5e93"
   integrity sha512-CAdX5Q3YW3Gclyo5Vpqkgpj8fSdLQcRuzfX6mC6Phy0nfJ0eGYOeS7m4mt2plDWLAtA4TqTakvbboHvUxfe4iA==
 
+image-tools@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.npmmirror.com/image-tools/-/image-tools-1.4.0.tgz#66aacbafad677af7f3fd7f32f8fa1e0881b83783"
+  integrity sha512-TKtvJ6iUwM0mfaD4keMnk1ENHFC470QEjBfA3IlvKdEOufzvWbjbaoNcoyYq6HlViF8+d5tOS1ooE6j7CHf1lQ==
+
 json-stringify-pretty-compact@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmmirror.com/json-stringify-pretty-compact/-/json-stringify-pretty-compact-4.0.0.tgz#cf4844770bddee3cb89a6170fe4b00eee5dbf1d4"

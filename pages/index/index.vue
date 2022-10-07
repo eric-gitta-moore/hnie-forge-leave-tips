@@ -93,6 +93,11 @@
 			<u-form-item label='计算时长'>
 				<u-input v-model="computedDuringTime" disabled></u-input>
 			</u-form-item>
+			<u-form-item label='请假材料' label-position='top'>
+				<u-upload :file-list='form.fileList' :auto-upload='false' :max-count='8' @on-list-change='onChooseFile'>
+				</u-upload>
+
+			</u-form-item>
 
 			<u-divider half-width='100%' class='form-divider' :margin-top='20' :margin-bottom='20'>审批信息</u-divider>
 
@@ -119,7 +124,7 @@
 			<u-form-item label='辅导员审批意见'>
 				<u-input v-model="form.instructorApproveReason" placeholder='默认值是空的'></u-input>
 			</u-form-item>
-			<u-form-item label='副书记审批时间' :label-style='{"background-color": `#ff5e66`}' v-if="computedDays>=3">
+			<u-form-item label='副书记审批时间' :label-style='{"background-color": `#ff5e66`}' v-if="form.computedDays>=3">
 				<u-input v-model="secretaryApproveTimeText" type='select'
 					@click='pickerSecretaryApproveTimeTimeIsShow=true'></u-input>
 				<u-picker :params='pickerApproveTimeParams' v-model="pickerSecretaryApproveTimeTimeIsShow"
@@ -146,6 +151,10 @@
 </template>
 
 <script>
+	import {
+		pathToBase64,
+		base64ToPath
+	} from 'image-tools'
 	import dayjs from 'dayjs'
 	import 'dayjs/locale/zh-cn' // 导入本地化语言
 	dayjs.locale('zh-cn') // 使用本地化语言
@@ -215,6 +224,9 @@
 					headmasterApproveReason: '通过',
 					instructorApproveReason: '',
 					secretaryApproveReason: '',
+					fileList: [],
+					computedDays: 0,
+					computedHours: 0,
 				}, presetData),
 				formDefault: {},
 
@@ -286,14 +298,12 @@
 					// 	text: 'webview'
 					// }
 				],
-				computedDays: 0,
-				computedHours: 0,
 			}
 		},
 		computed: {
 			...mapGetters(['applyCode']),
 			computedDuringTime() {
-				return `${this.computedDays} 天 ${this.computedHours} 小时`
+				return `${this.form.computedDays} 天 ${this.form.computedHours} 小时`
 			},
 			beginTimeText: {
 				get() {
@@ -376,6 +386,22 @@
 			}
 		},
 		methods: {
+			async onChooseFile(list) {
+				const res = []
+				for (const cursor of list) {
+					const data = {
+						url: cursor.url,
+						base64: cursor?.base64,
+					}
+					try {
+						data.base64 = await pathToBase64(cursor.url)
+					} catch (e) {
+						console.warn(e);
+					}
+					res.push(data)
+				}
+				this.form.fileList = res
+			},
 			saveDefault() {
 				this.formDefault = cloneDeep(this.form)
 			},
@@ -411,8 +437,8 @@
 						duration: 2000
 					});
 				}
-				this.computedDays = days
-				this.computedHours = hours
+				this.form.computedDays = days
+				this.form.computedHours = hours
 			},
 			gotoGenerate() {
 				uni.navigateTo({
