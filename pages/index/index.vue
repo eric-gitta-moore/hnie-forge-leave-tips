@@ -9,8 +9,6 @@
 		<u-action-sheet v-model="aboutActionSheetIsShow" :list='aboutActionSheetList' :cancel-btn="false"
 			@click='onClickAbout'>
 		</u-action-sheet>
-		<wrap-version-update ref="wrapVersionUpdate" id="633d4fda0f90b7000173039a" @check='onUpdateCheck'>
-		</wrap-version-update>
 
 		<u-top-tips ref="uTips" :navbar-height='statusBarHeight+navbarHeight'></u-top-tips>
 
@@ -131,7 +129,7 @@
 					@confirm='(res)=>form.secretaryApproveTime=res.timestamp' :default-time='secretaryApproveTimeText'>
 				</u-picker>
 			</u-form-item>
-			<u-form-item label='副书记审批意见'>
+			<u-form-item label='副书记审批意见' v-if="form.computedDays>=3">
 				<u-input v-model="form.secretaryApproveReason" placeholder='生成之前请三思,该空默认值未知'></u-input>
 			</u-form-item>
 			<u-row class='button-group'>
@@ -149,6 +147,8 @@
 			</u-row>
 		</u-form>
 
+		<wrap-version-update ref="wrapVersionUpdate" id="633d4fda0f90b7000173039a" @check='onUpdateCheck'>
+		</wrap-version-update>
 	</view>
 </template>
 
@@ -296,9 +296,9 @@
 					{
 						text: '关于'
 					},
-					// {
-					// 	text: 'webview'
-					// }
+					{
+						text: '检查更新'
+					}
 				],
 			}
 		},
@@ -475,9 +475,15 @@
 						break;
 
 					case '四天请假例子':
-						Object.assign(this.form, treeDaysLeaveTipExample)
+						this.form = {
+							...this.form,
+							...treeDaysLeaveTipExample
+						}
 						break;
 				}
+			},
+			validate() {
+
 			},
 			onClickAbout(idx) {
 				switch (this.aboutActionSheetList[idx].text) {
@@ -493,10 +499,13 @@
 						})
 						break;
 
-					case 'webview':
-						uni.navigateTo({
-							url: '/pages/index/web'
-						})
+					case '检查更新':
+						try {
+							this.$refs.wrapVersionUpdate.check()
+						} catch (e) {
+							console.warn(e);
+						}
+
 						break;
 				}
 			},

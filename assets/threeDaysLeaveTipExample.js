@@ -30,6 +30,8 @@ export default {
 			value: "44"
 		},
 	},
+	emergencyContact: '李四',
+	emergencyContactPhone: '13366669999',
 	destDetail: '',
 	beginTime: beginTime.unix(),
 	endTime: endTime.unix(),
