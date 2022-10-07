@@ -41,7 +41,7 @@
 						color: '#fff'
 					},
 					progress: {
-						color: '#008585'
+						color: '#5ed428'
 					},
 					buttons: [{
 						fontSrc: '_www/static/font/iconfont.ttf',
