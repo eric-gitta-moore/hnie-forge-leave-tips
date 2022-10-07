@@ -44,10 +44,22 @@
 						color: '#008585'
 					},
 					buttons: [{
-						type: 'menu',
+						fontSrc: '_www/static/font/iconfont.ttf',
+						text: '\ue670',
 						color: '#fff',
+						fontSize: '18px',
 						onclick: this.onClickMore
-					}]
+					}, {
+						fontSrc: '_www/static/font/iconfont.ttf',
+						text: '\ue60e',
+						color: '#fff',
+						fontSize: '24px',
+						onclick: () => {
+							uni.reLaunch({
+								url: '/pages/index/index'
+							})
+						}
+					}, ]
 				}
 			})
 			this.createWebview()
