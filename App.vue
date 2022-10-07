@@ -22,18 +22,6 @@
 				console.warn(e);
 			}
 			Object.assign(this.form, initializeFormData)
-
-			if (process.env.NODE_ENV === 'development') {
-				Object.assign(this.form, {
-					id: '202110050329',
-					name: '陈柯雨',
-					sex: '男',
-					className: '软件工程2102',
-					type: '病假',
-					reason: '去第六人民院看病',
-					destDetail: '湘潭市第六人民医院',
-				})
-			}
 			this.$store.dispatch('dispatchForm', this.form)
 		},
 	}
