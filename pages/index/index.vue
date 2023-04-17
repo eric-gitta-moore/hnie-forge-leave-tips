@@ -190,7 +190,7 @@
 				form: Object.assign({
 					id: '',
 					name: '',
-					sex: '男',
+					sex: '男性',
 					className: '',
 					type: '病假',
 					reason: '',
@@ -234,11 +234,11 @@
 
 				selectSexIsShow: false,
 				selectSexList: [{
-					value: '男',
-					label: '男'
+					value: '男性',
+					label: '男性'
 				}, {
-					value: '女',
-					label: '女'
+					value: '女性',
+					label: '女性'
 				}],
 
 				selectTypeIsShow: false,
