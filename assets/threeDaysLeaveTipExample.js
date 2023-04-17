@@ -11,7 +11,7 @@ const image =
 export default {
 	id: '202222222222',
 	name: '张三',
-	sex: '男',
+	sex: '男性',
 	className: '厚学法考2202',
 	type: '病假',
 	reason: '在家带病学习张三老师视频',
