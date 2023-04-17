@@ -147,8 +147,8 @@
 			</u-row>
 		</u-form>
 
-		<wrap-version-update ref="wrapVersionUpdate" id="633d4fda0f90b7000173039a" @check='onUpdateCheck'>
-		</wrap-version-update>
+		<!-- <wrap-version-update ref="wrapVersionUpdate" id="633d4fda0f90b7000173039a" @check='onUpdateCheck'>
+		</wrap-version-update> -->
 	</view>
 </template>
 
