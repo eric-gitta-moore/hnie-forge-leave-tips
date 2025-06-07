@@ -109,7 +109,7 @@
 				</u-picker>
 			</u-form-item>
 			<u-form-item label='班主任审批意见'>
-				<u-input v-model="form.headmasterApproveReason" placeholder='默认是"通过"'></u-input>
+				<u-input v-model="form.headmasterApproveReason" placeholder='默认是"同意"'></u-input>
 			</u-form-item>
 			<u-form-item label='辅导员审批时间'>
 				<u-input v-model="instructorApproveTimeText" type='select'
@@ -223,7 +223,7 @@
 					secretaryApproveTime: DateUtil.radomUnixTimeWithHour(10)
 						.add(-1, 'day')
 						.unix(),
-					headmasterApproveReason: '通过',
+					headmasterApproveReason: '同意',
 					instructorApproveReason: '',
 					secretaryApproveReason: '',
 					fileList: [],
